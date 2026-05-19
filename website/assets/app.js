@@ -196,13 +196,15 @@
         <div class="related-grid">${relatedHtml}</div>
       </section>
 
-      <section class="d-block d-cta">
+      <section class="d-block">
         <h2 class="d-block-title">完整文档</h2>
-        <p class="d-block-sub">SKILL.md / README / references 全部在 GitHub。</p>
-        <div class="d-cta-row">
-          <a class="btn btn-primary" href="${ghUrl}" target="_blank" rel="noopener">在 GitHub 查看源码</a>
-          <a class="btn btn-secondary" href="${ghUrl}#readme" target="_blank" rel="noopener">README</a>
-          <a class="btn btn-secondary" href="https://www.npmjs.com/package/${skill.pkg}" target="_blank" rel="noopener">NPM 包</a>
+        <div class="d-cta">
+          <p class="d-block-sub">SKILL.md / README / references 全部在 GitHub。</p>
+          <div class="d-cta-row">
+            <a class="btn btn-primary" href="${ghUrl}" target="_blank" rel="noopener">在 GitHub 查看源码</a>
+            <a class="btn btn-secondary" href="${ghUrl}/SKILL.md" target="_blank" rel="noopener">README</a>
+            <a class="btn btn-secondary" href="https://www.npmjs.com/package/${skill.pkg}" target="_blank" rel="noopener">NPM 包</a>
+          </div>
         </div>
       </section>
     `;
