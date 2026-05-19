@@ -9,6 +9,7 @@
   "files": [
     "bin",
     "src",
+    "skills",
     "README.md",
     "LICENSE"
   ],
@@ -19,7 +20,14 @@
   "repository": {
     "type": "git",
     "url": "git+https://github.com/sheerl/htx-skills-hub.git",
-    "directory": "htx-cli-impl"
+    "directory": "htx-cli"
+  },
+  "homepage": "https://htx-skills-hub.vercel.app",
+  "bugs": {
+    "url": "https://github.com/sheerl/htx-skills-hub/issues"
+  },
+  "publishConfig": {
+    "access": "public"
   },
   "keywords": ["htx", "huobi", "cli", "ai-agent", "trading", "crypto"],
   "license": "MIT",
