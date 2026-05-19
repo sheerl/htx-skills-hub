@@ -94,5 +94,5 @@ Before calling any transfer endpoint, **display to the user** source, destinatio
 ## 安装
 
 ```bash
-npx -y github:sheerl/htx-skills-hub htx-cli skill install spot-account
+npx -y github:sheerl/htx-skills-hub skill install spot-account
 ```

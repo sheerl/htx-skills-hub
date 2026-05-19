@@ -184,7 +184,7 @@ ta-master **不覆盖**以下指标（HTX 无原生 endpoint，需付费数据�
 ## 安装
 
 ```bash
-npx -y github:sheerl/htx-skills-hub htx-cli skill install ta-master
+npx -y github:sheerl/htx-skills-hub skill install ta-master
 ```
 
 ## 典型问法

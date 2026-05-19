@@ -134,7 +134,7 @@ htx-cli spot trading open-orders --symbol btcusdt --json
 ## 安装
 
 ```bash
-npx -y github:sheerl/htx-skills-hub htx-cli skill install spot-trading
+npx -y github:sheerl/htx-skills-hub skill install spot-trading
 ```
 
 ## 相关文档
