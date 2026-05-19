@@ -119,7 +119,7 @@ htx-cli spot-market depth -p symbol=solusdt -p type=step0 -p depth=20
 ## 安装
 
 ```bash
-npx -y @htx-skills/spot-market install
+npx -y github:sheerl/htx-skills-hub htx-cli skill install spot-market
 ```
 
 ## 相关文档

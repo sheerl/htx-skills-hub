@@ -218,7 +218,7 @@ htx-cli futures call /v1/swap_cross_cancelall --auth \
 ## 安装
 
 ```bash
-npx -y @htx-skills/futures-trading install
+npx -y github:sheerl/htx-skills-hub htx-cli skill install futures-trading
 ```
 
 ## 相关文档

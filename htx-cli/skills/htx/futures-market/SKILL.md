@@ -118,7 +118,7 @@ htx-cli futures-market contract-info -p contract_code=BTC-USDT
 ## 安装
 
 ```bash
-npx -y @htx-skills/futures-market install
+npx -y github:sheerl/htx-skills-hub htx-cli skill install futures-market
 ```
 
 ## 相关文档
