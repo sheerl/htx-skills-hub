@@ -203,7 +203,7 @@
           <div class="d-cta-row">
             <a class="btn btn-primary" href="${ghUrl}" target="_blank" rel="noopener">在 GitHub 查看源码</a>
             <a class="btn btn-secondary" href="${ghUrl}/SKILL.md" target="_blank" rel="noopener">README</a>
-            <a class="btn btn-secondary" href="https://www.npmjs.com/package/${skill.pkg}" target="_blank" rel="noopener">NPM 包</a>
+            <a class="btn btn-secondary" href="https://www.npmjs.com/package/@sheerl/htx-cli" target="_blank" rel="noopener">NPM 包</a>
           </div>
         </div>
       </section>
