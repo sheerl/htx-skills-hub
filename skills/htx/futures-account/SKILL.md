@@ -98,5 +98,5 @@ htx-cli futures call /v1/swap_ladder_margin --method GET -p contract_code=BTC-US
 ## 安装
 
 ```bash
-npx -y github:sheerl/htx-skills-hub skill install futures-account
+npx -y @sheerl/htx-cli skill install futures-account
 ```

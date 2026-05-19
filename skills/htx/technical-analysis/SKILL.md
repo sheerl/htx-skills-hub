@@ -134,5 +134,5 @@ python scripts/cycle.py all --kline btc1d.json
 ## 安装
 
 ```bash
-npx -y github:sheerl/htx-skills-hub skill install technical-analysis
+npx -y @sheerl/htx-cli skill install technical-analysis
 ```

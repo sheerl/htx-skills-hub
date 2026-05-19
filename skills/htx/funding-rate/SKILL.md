@@ -112,5 +112,5 @@ htx-cli funding-rate batch
 ## 安装
 
 ```bash
-npx -y github:sheerl/htx-skills-hub skill install funding-rate
+npx -y @sheerl/htx-cli skill install funding-rate
 ```
