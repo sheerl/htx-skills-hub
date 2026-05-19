@@ -10,6 +10,10 @@ import { run as fundingRate } from '../src/commands/funding-rate.js';
 import {
   oiTracker, elitePositioning, liquidationStream, markPrice, settlement,
 } from '../src/commands/derivatives.js';
+import { run as spotAccount } from '../src/commands/spot-account.js';
+import { run as spotTrading } from '../src/commands/spot-trading.js';
+import { run as futuresAccount } from '../src/commands/futures-account.js';
+import { run as futuresTrading } from '../src/commands/futures-trading.js';
 import { installSkill } from '../src/installer.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -24,6 +28,10 @@ const SKILLS = {
   'liquidation-stream': liquidationStream,
   'mark-price':         markPrice,
   'settlement':         settlement,
+  'spot-account':       { run: spotAccount },
+  'spot-trading':       { run: spotTrading },
+  'futures-account':    { run: futuresAccount },
+  'futures-trading':    { run: futuresTrading },
 };
 
 function parseArgs(argv) {
