@@ -92,10 +92,17 @@ window.HTX_SKILLS = [
   // ===== Analyst =====
   {
     slug: 'technical-analysis', name: '技术指标分析', nameEn: 'Technical Analysis', category: 'analyst', icon: '📐', auth: false,
-    desc: '本地计算 12 个经典技术指标（MA、MACD、RSI、布林带、ATR 等），输出趋势、动量与关键支撑压力位。',
-    scenarios: ['BTC 4H 技术面怎么看', 'ETH 是否超买', 'SOL 关键支撑位和压力位在哪'],
+    desc: '51 技术指标 + 12 K线形态 + 5 BTC 周期指标 + 自动背离检测，全部本地 Python 计算，零 API 消耗。',
+    scenarios: ['BTC 4H 技术面怎么看', 'ETH 是否超买', '扫描所有 K线形态', 'BTC 当前 AHR999 处在什么区间'],
     install: 'npx -y @htx-skills/technical-analysis install', pkg: '@htx-skills/technical-analysis',
     tags: ['技术分析', '指标', 'AI 分析'],
+  },
+  {
+    slug: 'ta-master', name: '技术分析大师', nameEn: 'TA Master', category: 'analyst', icon: '🎓', auth: false,
+    desc: '三支柱加权评分（价量 50% + 衍生品 30% + BTC 周期 20%），输出 0-100 综合评分 + 详细解读。',
+    scenarios: ['BTC 综合评分多少', '现在 ETH 综合面看怎么样', '帮我扫一下市场上 ta-master 评分 >70 的币'],
+    install: 'npx -y @htx-skills/ta-master install', pkg: '@htx-skills/ta-master',
+    tags: ['综合评分', '三支柱', 'AI 分析'],
   },
   {
     slug: 'derivatives-analyst', name: '衍生品压力分析', nameEn: 'Derivatives Analyst', category: 'analyst', icon: '🧪', auth: false,

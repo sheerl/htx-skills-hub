@@ -1,181 +1,138 @@
 ---
-name: htx-technical-analysis
-version: 1.0.0
-description: Technical analysis on HTX kline data — computes 12 indicators locally (MA, EMA, MACD, RSI, BOLL, ATR, ADX, KDJ, OBV, VWAP, Fibonacci, Donchian) and synthesizes a directional view with key levels and divergences. Public, no API key required.
-auth_required: false
-risk_level: none
+name: htx/technical-analysis
+version: 3.0.0
+description: HTX 技术指标分析引擎 — 51 指标 + 12 K线形态 + 5 BTC 周期指标 + 自动背离检测，全部本地 Python 计算
+auth: false
+risk: low
 ---
 
-# HTX Technical Analysis
+# Technical Analysis — 技术指标分析引擎 v3
 
-Layer 2 analytical skill. Pulls kline data via `htx-cli` (spot or futures) and runs a **local Python indicator engine** to produce a synthesized read on trend, momentum, volatility, and key levels — without consuming any API quota for indicator computation.
+本地计算引擎，**无需 API Key**。从 HTX K线 endpoint 拉数据，本地用 numpy/pandas 算指标 / 形态 / 周期。
 
-## When to use this skill
+> **合规声明**：本 skill 提供原始指标数值，不嵌入任何策略推荐或交易建议。所有判断由用户结合自身风险承受能力做出。
 
-Load this skill when the user asks for:
+## 能力总览
 
-- "Technical analysis on BTC 4h"
-- "Is ETH trend up or down?"
-- "BTC RSI / MACD / Bollinger / Fibonacci levels"
-- "Multi-timeframe view on SOL (1h + 4h + 1d)"
-- "Detect divergence on BTC-USDT"
-- "Where are the key support/resistance levels for ETH?"
+| 类别 | 数量 | 文件 |
+|---|---|---|
+| 移动均线 | 8 (ma, ema, wma, dema, tema, hma, kama, zlema) | `scripts/indicators.py` |
+| 趋势 | 8 (macd, adx, aroon, cci, supertrend, sar, dpo, envelope) | 同上 |
+| 动量 | 10 (rsi, stoch-rsi, stoch, kdj, roc, mom, ppo, trix, wr, uo) | 同上 |
+| 波动率 | 8 (bb, bbwidth, bbpct, atr, keltner, donchian, hv, stddev) | 同上 |
+| 成交量 | 6 (obv, vwap, mvwap, cmf, mfi, ad) | 同上 |
+| 统计 | 5 (lr, slope, angle, variance, sigma) | 同上 |
+| 其他 | 5 (fisher, tr, tp, mp, cho) + divergence | 同上 |
+| **K线形态** | 12 (doji / engulfing / harami / 3-soldiers / 3-crows ...) | `scripts/patterns.py` |
+| **BTC 周期** | 5 (ahr999 / ahr999x / rainbow / pi-cycle / mayer) | `scripts/cycle.py` |
+| **指标合计** | **51 指标 + 12 形态 + 5 周期 = 68** | |
 
-## Underlying tools
+## 快速上手
 
-1. **`htx-cli`** — fetches klines (spot from `htx-cli spot market klines`, futures via `htx-cli futures call ... mark/kline`)
-2. **`indicators.py`** (bundled, pure Python stdlib, **no numpy required**) — local indicator engine
-
-The script is installed alongside SKILL.md at `~/.claude/skills/htx/technical-analysis/scripts/indicators.py`.
-
-## Indicator catalog (12)
-
-| Key | Indicator | Output |
-|-----|-----------|--------|
-| `ma` | Simple Moving Average (SMA20) | series |
-| `ema` | Exponential Moving Average (EMA20) | series |
-| `macd` | MACD (12,26,9) | macd / signal_line / hist |
-| `rsi` | Relative Strength Index (14) | 0-100 series |
-| `boll` | Bollinger Bands (20, 2σ) | upper / middle / lower |
-| `atr` | Average True Range (14) | volatility series |
-| `adx` | ADX + DI± (14) | trend strength |
-| `kdj` | KDJ Stochastic (9,3,3) | k / d / j |
-| `obv` | On-Balance Volume | cumulative series |
-| `vwap` | Volume-Weighted Average Price | session series |
-| `fib` | Fibonacci retracement (last 100 bars) | 23.6/38.2/50/61.8/78.6 levels |
-| `dc` | Donchian Channel (20) | upper / middle / lower |
-
-## Standard workflow
-
-### Step 1 — Fetch klines
-
-For **spot** symbols (e.g. `btcusdt`):
+### 拉 K线 + 算指标
 
 ```bash
-htx-cli spot market klines btcusdt --period 4hour --size 200 --json
+# 1. 拉 BTC/USDT 4小时 K线
+htx-cli spot-market kline -p symbol=btcusdt -p period=4hour -p size=300 \
+  | jq '.data' > /tmp/btc4h.json
+
+# 2. 算 RSI
+python scripts/indicators.py rsi --kline /tmp/btc4h.json --params 14
+# → {"rsi": 62.4, "ts": 1779000000000}
+
+# 3. 算 MACD（默认 12,26,9）
+python scripts/indicators.py macd --kline /tmp/btc4h.json
+# → {"dif": 320.1, "dea": 245.3, "macd": 149.6, "ts": ...}
+
+# 4. 扫描所有 K线形态
+python scripts/patterns.py scan --kline /tmp/btc4h.json
+# → {"patterns": ["doji", "bull-engulf"], "ts": ...}
+
+# 5. BTC 周期一键全测
+python scripts/cycle.py all --kline /tmp/btc1d.json
 ```
 
-For **USDT-M futures** (e.g. `BTC-USDT`):
+### 列出所有指标
 
 ```bash
-htx-cli futures call GET /linear-swap-ex/market/history/kline \
-  -p contract_code=BTC-USDT -p period=240min -p size=200 --json
+python scripts/indicators.py list
+# → ["ma", "ema", "rsi", "macd", "supertrend", ...]
 ```
 
-Period values:
-- spot: `1min, 5min, 15min, 30min, 60min, 4hour, 1day, 1mon, 1week, 1year`
-- futures: `1min, 5min, 15min, 30min, 60min, 4hour, 1day` (note: 4hour expressed as `240min` in some endpoints; the convenience `htx-cli spot market klines` uses spot's set)
+## 命令参考
 
-### Step 2 — Pipe to indicator engine
+详见 `references/`：
+- `references/indicators.md` — 51 个技术指标的参数 / 返回字段 / 公式说明
+- `references/patterns.md` — 12 个 K线形态的判定规则与典型场景
+- `references/cycle.md` — BTC 5 个周期指标的公式与解读区间
+- `references/divergence.md` — 自动背离检测的算法 + 使用建议
+
+## 自动背离检测
 
 ```bash
-htx-cli spot market klines btcusdt --period 4hour --size 200 --json \
-  | python3 ~/.claude/skills/htx/technical-analysis/scripts/indicators.py --all
+python scripts/indicators.py divergence --kline /tmp/btc4h.json --params 14
+# → {"divergence": "bull_reg", ...}
 ```
 
-Or pick specific indicators:
+返回值：
+- `bull_reg` — 价格创新低，指标未创新低（**底部反转信号**）
+- `bear_reg` — 价格创新高，指标未创新高（**顶部反转信号**）
+- `bull_hid` — 价格更高低点，指标更低低点（**回调延续多头**）
+- `bear_hid` — 价格更低高点，指标更高高点（**反弹延续空头**）
+
+## BTC 周期指标（仅 BTC-USDT 适用）
+
+5 个指标全部基于价格 + 时间公式，无需链上数据：
+
+| 指标 | 用途 | 解读 |
+|---|---|---|
+| `ahr999` | 定投择时 | <0.45 抄底 / 0.45-1.2 定投 / >1.2 顶部预警 |
+| `ahr999x` | 纯周期信号 | 与 fitted curve 比值 |
+| `rainbow` | 9 段彩虹估值带 | "Fire Sale" → "Maximum Bubble" |
+| `pi-cycle` | 周期顶预警 | 111d MA 上穿 350d MA × 2 = 历史顶 |
+| `mayer` | 长期估值 | <1 低估 / >2.4 历史泡沫 |
+
+## 数据需求
+
+| 指标类型 | 最少 K线数 |
+|---|---|
+| 短周期指标（RSI 14, MACD 26, ATR 14） | 50 根 |
+| 长周期指标（MA200, KAMA） | 200+ 根 |
+| BTC 周期（Pi Cycle 350d, Mayer 200d） | 350+ 根日 K |
+| 背离检测 | 50+ 根 |
+
+## 典型场景
+
+**「BTC 4H 技术面怎么看」**
+```bash
+htx-cli spot-market kline -p symbol=btcusdt -p period=4hour -p size=200 | jq '.data' > btc.json
+python scripts/indicators.py rsi --kline btc.json
+python scripts/indicators.py macd --kline btc.json
+python scripts/indicators.py supertrend --kline btc.json
+python scripts/patterns.py scan --kline btc.json
+python scripts/indicators.py divergence --kline btc.json
+# AI 综合所有输出做判断
+```
+
+**「ETH 是否超买」**
+```bash
+python scripts/indicators.py rsi --kline eth4h.json
+# rsi > 70 即超买
+```
+
+**「BTC 现在长期估值水平」**
+```bash
+htx-cli spot-market kline -p symbol=btcusdt -p period=1day -p size=400 | jq '.data' > btc1d.json
+python scripts/cycle.py all --kline btc1d.json
+```
+
+## 与其他 skill 的关系
+
+- **数据来源**：依赖 `htx/spot-market` 或 `htx/futures-market` 提供 K线
+- **上层编排**：被 `htx/ta-master` 调用，作为「价量因子」支柱
+
+## 安装
 
 ```bash
-htx-cli spot market klines btcusdt --period 4hour --size 200 --json \
-  | python3 ~/.claude/skills/htx/technical-analysis/scripts/indicators.py \
-      --include rsi,macd,boll,fib --tail 3
+npx -y @htx-skills/technical-analysis install
 ```
-
-### Step 3 — Synthesize and respond
-
-The script returns:
-
-```json
-{
-  "meta": {"count": 200, "first_ts": ..., "last_ts": ..., "last_close": 67890.0, ...},
-  "indicators": {
-    "rsi": {"length": 14, "series": [..., 62.4]},
-    "macd": {"macd": [...], "signal_line": [...], "hist": [...]},
-    "boll": {"upper": [...], "middle": [...], "lower": [...]},
-    ...
-  }
-}
-```
-
-## Multi-timeframe alignment
-
-For a higher-confidence view, run the engine on 3 timeframes:
-
-```bash
-for p in 60min 4hour 1day; do
-  htx-cli spot market klines btcusdt --period $p --size 200 --json \
-    | python3 ~/.claude/skills/htx/technical-analysis/scripts/indicators.py \
-        --include rsi,macd --tail 1 \
-    | jq --arg p "$p" '. + {tf: $p}'
-done
-```
-
-Then combine: if RSI direction agrees on 1h/4h/1d → `confidence = high`; if disagrees → `confidence = low`.
-
-## Output guidance
-
-Synthesize into a structured JSON for downstream Skills:
-
-```json
-{
-  "skill": "technical-analysis",
-  "symbol": "btcusdt",
-  "timeframe": "4hour",
-  "summary": {
-    "direction": "bullish | bearish | neutral",
-    "confidence": "high | medium | low",
-    "signal_strength": 0-100,
-    "one_liner": "short conclusion"
-  },
-  "trend": {
-    "direction": "up | down | sideways",
-    "ema_alignment": "bullish | bearish | mixed",
-    "adx_strength": "strong | moderate | weak"
-  },
-  "indicators": {
-    "rsi": {"value": ..., "zone": "overbought | oversold | neutral"},
-    "macd": {"signal": "golden | death | none", "hist_direction": "rising | falling"},
-    "boll": {"position": "above_upper | middle | below_lower"}
-  },
-  "key_levels": {
-    "support": [..., ...],
-    "resistance": [..., ...],
-    "fib_50": ...,
-    "fib_618": ...
-  },
-  "patterns": {
-    "divergence": "bullish | bearish | none"
-  },
-  "risk_warning": "..."
-}
-```
-
-### Direction-classification rule of thumb
-
-| Condition | Direction |
-|-----------|-----------|
-| EMA20 > EMA60 AND MACD hist > 0 AND RSI > 55 AND price > BOLL middle | bullish |
-| Reverse all above | bearish |
-| Mixed signals | neutral |
-
-### Divergence detection
-
-| Pattern | Setup |
-|---------|-------|
-| Bullish divergence | Price makes lower low, RSI makes higher low |
-| Bearish divergence | Price makes higher high, RSI makes lower high |
-
-The engine returns RSI / MACD series; let the agent compare last 2-3 swing pivots against price highs/lows.
-
-## Related skills
-
-- `@htx-skills/spot-market` / `@htx-skills/futures-market` — kline data sources
-- `@htx-skills/mark-price` — for futures, prefer mark price kline over last-price kline (less noise)
-- `@htx-skills/derivatives-analyst` — pair technicals with derivatives pressure for full view
-- `@htx-skills/market-overview` — find which symbol to analyze first
-
-## Notes
-
-- Indicators are **deterministic & reproducible** — same kline input = same output, byte-for-byte
-- Pure Python stdlib; no `pip install` required
-- Output values are deliberately trimmed to last N (default 5) per series to keep agent context lean — agent can request `--tail 0` for full series if needed
