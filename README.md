@@ -1,68 +1,68 @@
 # HTX AI Skills
 
-> HTX 面向 AI Agent 生态推出的开放交易协议 —— 一行命令安装，让 AI Agent 通过自然语言查询行情、管理资产、执行现货与合约交易。
+> HTX's open trading protocol for the AI Agent ecosystem — install with a single command and let your AI Agent query markets, manage assets, and execute spot and futures trades through natural language.
 
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 [![Skills](https://img.shields.io/badge/skills-16-blue.svg)](htx-cli/skills/htx)
 [![Demo](https://img.shields.io/badge/demo-live-brightgreen.svg)](https://htx-skills-hub.vercel.app)
 
-## 简介
+## Overview
 
-HTX AI Skills 是 HTX 推出的开放 AI 交易 Skill 市场。开发者可以浏览、安装各类模块化 Skill，扩展 AI 交易助手的能力，覆盖行情查询、交易执行、衍生品分析、风险监控等场景。
+HTX AI Skills is HTX's open marketplace of AI trading Skills. Developers can browse and install modular Skills to extend their AI trading assistant's capabilities, covering market data queries, trade execution, derivatives analysis, risk monitoring, and more.
 
-- 🚀 一行命令安装到 AI Agent
-- 🔒 本地运行 / API Key 不出本机
-- ✅ 写操作强制人工二次确认
-- 📜 MIT 开源，可审计可定制
+- One-line installation into any AI Agent
+- Runs locally — your API Key never leaves your machine
+- Mandatory manual confirmation for all write operations
+- MIT-licensed, fully auditable and customizable
 
-## Skills 目录
+## Skills Catalog
 
-### 现货
-- [`spot-market`](htx-cli/skills/htx/spot-market) — 现货行情
-- [`spot-account`](htx-cli/skills/htx/spot-account) — 现货账户
-- [`spot-trading`](htx-cli/skills/htx/spot-trading) — 现货交易
+### Spot
+- [`spot-market`](htx-cli/skills/htx/spot-market) — Spot market data
+- [`spot-account`](htx-cli/skills/htx/spot-account) — Spot account
+- [`spot-trading`](htx-cli/skills/htx/spot-trading) — Spot trading
 
-### 合约
-- [`futures-market`](htx-cli/skills/htx/futures-market) — 合约行情
-- [`funding-rate`](htx-cli/skills/htx/funding-rate) — 资金费率
-- [`oi-tracker`](htx-cli/skills/htx/oi-tracker) — 持仓量追踪
-- [`elite-positioning`](htx-cli/skills/htx/elite-positioning) — 精英多空比
-- [`liquidation-stream`](htx-cli/skills/htx/liquidation-stream) — 清算流
-- [`mark-price`](htx-cli/skills/htx/mark-price) — 标记价 / 溢价 / 基差
-- [`settlement`](htx-cli/skills/htx/settlement) — 结算与保险基金
-- [`futures-account`](htx-cli/skills/htx/futures-account) — 合约账户
-- [`futures-trading`](htx-cli/skills/htx/futures-trading) — 合约交易
+### Futures
+- [`futures-market`](htx-cli/skills/htx/futures-market) — Futures market data
+- [`funding-rate`](htx-cli/skills/htx/funding-rate) — Funding Rate
+- [`oi-tracker`](htx-cli/skills/htx/oi-tracker) — Open Interest tracking
+- [`elite-positioning`](htx-cli/skills/htx/elite-positioning) — Elite Long/Short Ratio
+- [`liquidation-stream`](htx-cli/skills/htx/liquidation-stream) — Liquidation stream
+- [`mark-price`](htx-cli/skills/htx/mark-price) — Mark Price / Premium / Basis
+- [`settlement`](htx-cli/skills/htx/settlement) — Settlement and Insurance Fund
+- [`futures-account`](htx-cli/skills/htx/futures-account) — Futures account
+- [`futures-trading`](htx-cli/skills/htx/futures-trading) — Futures trading
 
-### 分析
-- [`technical-analysis`](htx-cli/skills/htx/technical-analysis) — 技术指标分析
-- [`derivatives-analyst`](htx-cli/skills/htx/derivatives-analyst) — 衍生品压力分析
-- [`sentiment-analyst`](htx-cli/skills/htx/sentiment-analyst) — 市场情绪
-- [`market-overview`](htx-cli/skills/htx/market-overview) — 市场总览
+### Analysis
+- [`technical-analysis`](htx-cli/skills/htx/technical-analysis) — Technical indicator analysis
+- [`derivatives-analyst`](htx-cli/skills/htx/derivatives-analyst) — Derivatives pressure analysis
+- [`sentiment-analyst`](htx-cli/skills/htx/sentiment-analyst) — Market sentiment
+- [`market-overview`](htx-cli/skills/htx/market-overview) — Market overview
 
-## 快速开始
+## Quick Start
 
 ```bash
-# 以 spot-market 为例
+# Example: spot-market
 npx -y @htx-skills/spot-market install
 ```
 
-安装后，在 AI Agent 中直接用自然语言提问：
+After installation, ask your AI Agent in plain natural language:
 
-> "BTC 现在什么价格？"
-> "ETH/USDT 4H K线走势"
-> "全市场资金费率扫描"
+> "What's the current price of BTC?"
+> "Show me the 4H candlestick chart for ETH/USDT"
+> "Scan funding rates across the whole market"
 
-## Demo 站点
+## Demo Site
 
-访问 https://htx-skills-hub.vercel.app 浏览所有 16 个 Skill。
+Visit https://htx-skills-hub.vercel.app to browse all 16 Skills.
 
-## 开发
+## Development
 
 ```bash
 git clone https://github.com/sheerl/htx-skills-hub.git
 cd htx-skills-hub/website
 python3 -m http.server 8000
-# 打开 http://localhost:8000
+# Open http://localhost:8000
 ```
 
 ## License

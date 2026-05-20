@@ -1,87 +1,87 @@
 ---
 name: htx/funding-rate
 version: 2.0.0
-description: HTX USDT 永续合约资金费率 — 当前 / 全市场批量 / 历史 / 估算下一期 K线
+description: HTX USDT-M perpetual funding rate — current / market-wide batch / history / estimated next-period klines.
 auth: false
 risk: low
 ---
 
-# Funding Rate — 资金费率
+# Funding Rate
 
-监控 HTX USDT-M 永续合约资金费率。**无需 API Key**。
+Monitor HTX USDT-M perpetual funding rate. **No API key required**.
 
-资金费率每 8 小时结算一次（UTC 0:00 / 8:00 / 16:00），**正费率**多头付给空头，**负费率**空头付给多头。可用于：
-- 套利（费率为正时做空 + 现货做多套保）
-- 情绪信号（极端正费率 = 多头过热，潜在挤仓）
-- 持仓成本测算
+Funding rate settles every 8 hours (UTC 0:00 / 8:00 / 16:00). **Positive rate** means longs pay shorts; **negative rate** means shorts pay longs. Useful for:
+- Arbitrage (short perpetual + spot long hedge when rate is positive)
+- Sentiment signal (extreme positive rate = longs overheated, potential squeeze)
+- Position cost estimation
 
-## 何时使用
+## When to use
 
-- 查询单合约当前资金费率
-- 全市场扫描，发现费率异常合约
-- 拉取历史费率序列做趋势分析
-- 估算下一期资金费率走势（K线形式）
+- Query the current funding rate of a single contract
+- Market-wide scan to find contracts with abnormal funding rates
+- Pull historical funding rate series for trend analysis
+- Estimate the next-period funding rate trend (kline form)
 
-## 快速开始
+## Quick start
 
 ```bash
-# BTC 永续当前费率
+# BTC perpetual current funding rate
 htx-cli funding-rate current -p contract_code=BTC-USDT
 
-# 全市场所有永续费率
+# All perpetual funding rates market-wide
 htx-cli funding-rate batch
 
-# BTC 历史费率（最近 30 期 = 10 天）
+# BTC historical funding rate (last 30 periods = 10 days)
 htx-cli funding-rate history -p contract_code=BTC-USDT -p page_size=30
 ```
 
-## 可用命令（4 个 endpoint）
+## Available commands (4 endpoints)
 
-| 命令 | HTX endpoint | 描述 |
-|------|--------------|------|
-| `current` | `GET /linear-swap-api/v1/swap_funding_rate` | 单合约当前费率 + 下次结算时间 |
-| `batch` | `GET /linear-swap-api/v1/swap_batch_funding_rate` | 全市场所有合约批量费率 |
-| `history` | `GET /linear-swap-api/v1/swap_historical_funding_rate` | 历史费率序列（分页） |
-| `estimated-kline` | `GET /linear-swap-ex/market/history/funding_rate` | 估算下一期费率 K线 |
+| Command | HTX endpoint | Description |
+|---------|--------------|-------------|
+| `current` | `GET /linear-swap-api/v1/swap_funding_rate` | Single-contract current rate + next settlement time |
+| `batch` | `GET /linear-swap-api/v1/swap_batch_funding_rate` | Batch funding rates for all contracts market-wide |
+| `history` | `GET /linear-swap-api/v1/swap_historical_funding_rate` | Historical funding rate series (paginated) |
+| `estimated-kline` | `GET /linear-swap-ex/market/history/funding_rate` | Estimated next-period funding rate kline |
 
-## 参数说明
+## Parameter reference
 
-- `contract_code` — `BTC-USDT` / `ETH-USDT` / `SOL-USDT` 等
-- `page_index` — 页码，从 1 开始
-- `page_size` — 每页条数，最大 50
-- `period` — K线周期（`estimated-kline` 用）：`1min` `5min` `15min` `30min` `60min` `4hour` `1day`
-- `size` — K线条数 1-2000
+- `contract_code` — `BTC-USDT` / `ETH-USDT` / `SOL-USDT` etc.
+- `page_index` — page number, starting from 1
+- `page_size` — records per page, max 50
+- `period` — kline period (used by `estimated-kline`): `1min` `5min` `15min` `30min` `60min` `4hour` `1day`
+- `size` — number of klines, 1-2000
 
-## 典型场景
+## Typical scenarios
 
-**「BTC 永续当前资金费率多少？」**
+**"What is the current funding rate of BTC perpetual?"**
 ```bash
 htx-cli funding-rate current -p contract_code=BTC-USDT
-# 返回 funding_rate（当前期）+ estimated_rate（预估下一期）+ next_funding_time
+# Returns funding_rate (current period) + estimated_rate (estimated next period) + next_funding_time
 ```
 
-**「哪些币资金费率为负？做多反而拿钱？」**
+**"Which coins have negative funding rates? (Get paid for going long?)"**
 ```bash
 htx-cli funding-rate batch
-# AI Agent 过滤 funding_rate < 0 的合约
+# AI Agent filters contracts where funding_rate < 0
 ```
 
-**「BTC 近 7 天资金费率走势」**
+**"BTC funding rate trend over the last 7 days"**
 ```bash
-# 7 天 = 21 期
+# 7 days = 21 periods
 htx-cli funding-rate history -p contract_code=BTC-USDT -p page_size=21
-# 数组按时间倒序
+# Array sorted by time descending
 ```
 
-**「全市场最热（费率最高）的 5 个永续」**
+**"Top 5 hottest (highest funding rate) perpetuals market-wide"**
 ```bash
 htx-cli funding-rate batch
-# 按 funding_rate 降序取前 5
+# Sort descending by funding_rate, take top 5
 ```
 
-## 输出 schema 摘录
+## Output schema excerpt
 
-`current` 返回：
+`current` returns:
 ```json
 {
   "status": "ok",
@@ -97,19 +97,19 @@ htx-cli funding-rate batch
 }
 ```
 
-## 解读建议
+## Interpretation guidance
 
-| funding_rate 区间 | 含义 |
-|------------------|------|
-| > 0.0005 (0.05%) | 多头过热，警惕回调 |
-| 0.0001 ~ 0.0005 | 偏多氛围 |
-| -0.0001 ~ 0.0001 | 中性 |
-| < -0.0001 | 偏空氛围 |
-| < -0.0005 | 空头过热，潜在反弹 |
+| funding_rate range | Meaning |
+|--------------------|---------|
+| > 0.0005 (0.05%) | Longs overheated; watch for pullback |
+| 0.0001 ~ 0.0005 | Bullish-leaning |
+| -0.0001 ~ 0.0001 | Neutral |
+| < -0.0001 | Bearish-leaning |
+| < -0.0005 | Shorts overheated; potential rebound |
 
-> 注：判断需结合现货 / 衍生品价差、持仓量变化等，单一指标不足。
+> Note: judgment must be combined with spot/derivatives spread, OI changes, etc. A single indicator is not enough.
 
-## 安装
+## Installation
 
 ```bash
 npx -y @sheerl/htx-cli skill install funding-rate

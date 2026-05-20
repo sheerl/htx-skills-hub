@@ -1,14 +1,14 @@
 ---
 name: htx/futures-account
 version: 2.0.0
-description: HTX USDT-M 永续合约账户 — 余额 / 持仓 / 杠杆档位 / 调整因子 / 统一账户类型切换
+description: HTX USDT-M perpetual futures account — balance / positions / leverage tiers / adjustment factors / unified account type switching.
 auth: true
 risk: medium
 ---
 
-# Futures Account — 合约账户
+# Futures Account
 
-查询 USDT-M 永续合约账户与持仓，包含杠杆档位、调整因子、统一账户切换等参考数据。Read permission is enough for 26 of 30 endpoints. Transfers (4) need write.
+Query USDT-M perpetual futures account and positions, including leverage tiers, adjustment factors, unified account switching, and other reference data. Read permission is enough for 26 of 30 endpoints. Transfers (4) need write.
 
 ## Endpoint catalog (30)
 
@@ -71,20 +71,20 @@ All paths in this skill have base `/linear-swap-api` unless noted. "Mode" column
 
 ## Workflow patterns
 
-### 查询全仓账户 + 持仓总览
+### Query cross-margin account + position overview
 
 ```bash
 htx-cli futures call /v1/swap_cross_account_info --auth -p margin_account=USDT --json
 htx-cli futures call /v1/swap_cross_account_position_info --auth --json
 ```
 
-### 查询逐仓 BTC-USDT 持仓
+### Query isolated BTC-USDT position
 
 ```bash
 htx-cli futures call /v1/swap_position_info --auth -p contract_code=BTC-USDT --json
 ```
 
-### 查询 BTC-USDT 杠杆档位
+### Query BTC-USDT leverage tiers
 
 ```bash
 htx-cli futures call /v1/swap_ladder_margin --method GET -p contract_code=BTC-USDT --json
@@ -92,10 +92,10 @@ htx-cli futures call /v1/swap_ladder_margin --method GET -p contract_code=BTC-US
 
 ## Safety
 
-- 切换账户类型 / 切换仓位模式 / 主子账户划转都是**写操作**。AI Agent 必须先向用户展示当前状态、目标状态，得到明确确认后再执行。
-- 切换前需检查无持仓与挂单（系统会校验，但提前告知用户更友好）。
+- Switching account type / switching position mode / master-sub transfers are all **write operations**. The AI Agent must first show the user the current state and target state, and only execute after explicit manual confirmation.
+- Before switching, you need to check that there are no positions or open orders (the system will validate, but informing the user up front is friendlier).
 
-## 安装
+## Installation
 
 ```bash
 npx -y @sheerl/htx-cli skill install futures-account

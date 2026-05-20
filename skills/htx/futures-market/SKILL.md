@@ -1,126 +1,126 @@
 ---
 name: htx/futures-market
 version: 2.0.0
-description: HTX USDT 永续合约核心行情 — 合约信息 / K线 / Ticker / 盘口 / 索引价 / 系统状态
+description: HTX USDT-M perpetual futures core market data — contract info / klines / ticker / order book / index price / system status.
 auth: false
 risk: low
 ---
 
-# Futures Market — 合约行情
+# Futures Market
 
-读取 HTX USDT-M 永续合约公开行情数据。**无需 API Key**。
+Read public market data for HTX USDT-M perpetual futures. **No API key required**.
 
-> 资金费率、持仓量、清算、标记价 / 基差等**专项**数据已拆分到独立 skill，本 skill 只覆盖通用行情。
+> Specialized data such as funding rate, open interest, liquidations, mark price / basis has been split into dedicated skills. This skill only covers general market data.
 
-## 何时使用
+## When to use
 
-- 查询永续合约实时价格、24h 统计、索引价
-- 拉取 K线（标准 K线，非标记价 / 溢价指数）
-- 查看盘口深度
-- 检查合约元数据（合约 size、精度、上线状态）
-- 检查交易所系统状态
+- Query perpetual real-time price, 24h statistics, index price
+- Pull klines (standard klines, not mark price / premium index)
+- View order book depth
+- Check contract metadata (contract size, precision, listing status)
+- Check exchange system status
 
-## 快速开始
+## Quick start
 
 ```bash
-# BTC 永续最新行情
+# BTC perpetual latest market data
 htx-cli futures-market detail-merged -p contract_code=BTC-USDT
 
-# ETH 永续 1h K线
+# ETH perpetual 1h klines
 htx-cli futures-market kline -p contract_code=ETH-USDT -p period=60min -p size=200
 
-# 所有永续合约信息
+# All perpetual contract info
 htx-cli futures-market contract-info
 ```
 
-## 可用命令（15 个 endpoint）
+## Available commands (15 endpoints)
 
-### 行情数据
+### Market data
 
-| 命令 | HTX endpoint | 描述 |
-|------|--------------|------|
-| `detail-merged` | `GET /linear-swap-ex/market/detail/merged` | 单合约实时摘要 |
-| `detail-batch-merged` | `GET /linear-swap-ex/market/detail/batch_merged` | 批量合约实时摘要 |
-| `kline` | `GET /linear-swap-ex/market/history/kline` | 历史 K线 |
-| `depth` | `GET /linear-swap-ex/market/depth` | 盘口深度 |
-| `bbo` | `GET /linear-swap-ex/market/bbo` | 最优买卖价 |
-| `trade` | `GET /linear-swap-ex/market/trade` | 最新一笔成交 |
-| `history-trade` | `GET /linear-swap-ex/market/history/trade` | 历史成交 |
+| Command | HTX endpoint | Description |
+|---------|--------------|-------------|
+| `detail-merged` | `GET /linear-swap-ex/market/detail/merged` | Single-contract real-time summary |
+| `detail-batch-merged` | `GET /linear-swap-ex/market/detail/batch_merged` | Batch real-time summary across contracts |
+| `kline` | `GET /linear-swap-ex/market/history/kline` | Historical klines |
+| `depth` | `GET /linear-swap-ex/market/depth` | Order book depth |
+| `bbo` | `GET /linear-swap-ex/market/bbo` | Best bid/offer |
+| `trade` | `GET /linear-swap-ex/market/trade` | Latest single trade |
+| `history-trade` | `GET /linear-swap-ex/market/history/trade` | Historical trades |
 
-### 索引与公允价格
+### Index and fair-value prices
 
-| 命令 | HTX endpoint | 描述 |
-|------|--------------|------|
-| `index-price` | `GET /linear-swap-api/v1/swap_index` | 实时指数价格 |
+| Command | HTX endpoint | Description |
+|---------|--------------|-------------|
+| `index-price` | `GET /linear-swap-api/v1/swap_index` | Real-time index price |
 
-> 标记价 / 溢价指数 / 基差 K线请用 `htx/mark-price`
+> For mark price / premium index / basis klines, use `htx/mark-price`
 
-### 元数据
+### Metadata
 
-| 命令 | HTX endpoint | 描述 |
-|------|--------------|------|
-| `contract-info` | `GET /linear-swap-api/v1/swap_contract_info` | 合约元信息 |
-| `query-elements` | `GET /linear-swap-api/v1/swap_query_elements` | 合约要素（精度、size） |
-| `risk-info` | `GET /linear-swap-api/v1/swap_risk_info` | 平台风险准备金 |
-| `funding-rate-cap` | `GET /linear-swap-api/v1/swap_funding_rate_cap_info` | 资金费率上下限 |
+| Command | HTX endpoint | Description |
+|---------|--------------|-------------|
+| `contract-info` | `GET /linear-swap-api/v1/swap_contract_info` | Contract metadata |
+| `query-elements` | `GET /linear-swap-api/v1/swap_query_elements` | Contract elements (precision, size) |
+| `risk-info` | `GET /linear-swap-api/v1/swap_risk_info` | Platform risk reserve fund |
+| `funding-rate-cap` | `GET /linear-swap-api/v1/swap_funding_rate_cap_info` | Funding rate upper/lower bounds |
 
-### 系统状态
+### System status
 
-| 命令 | HTX endpoint | 描述 |
-|------|--------------|------|
-| `timestamp` | `GET /api/v1/timestamp` | 服务器时间 |
-| `heartbeat` | `GET /heartbeat/` | 系统心跳与状态 |
-| `transfer-state` | `GET /linear-swap-api/v1/swap_transfer_state` | 划转开关状态 |
+| Command | HTX endpoint | Description |
+|---------|--------------|-------------|
+| `timestamp` | `GET /api/v1/timestamp` | Server time |
+| `heartbeat` | `GET /heartbeat/` | System heartbeat and status |
+| `transfer-state` | `GET /linear-swap-api/v1/swap_transfer_state` | Transfer switch state |
 
-## 参数说明
+## Parameter reference
 
-- `contract_code` — 合约代码大写连字符，如 `BTC-USDT` / `ETH-USDT` / `SOL-USDT`
+- `contract_code` — Contract code, uppercase with hyphen, e.g. `BTC-USDT` / `ETH-USDT` / `SOL-USDT`
 - `period` — `1min` `5min` `15min` `30min` `60min` `4hour` `1day` `1week` `1mon`
-- `size` — K线返回条数 1-2000
-- `type` — 盘口聚合：`step0` 到 `step19`
-- `business_type` — `swap` (USDT 永续) / `futures` (交割) / `all`
+- `size` — Number of klines returned, 1-2000
+- `type` — Order book aggregation: `step0` to `step19`
+- `business_type` — `swap` (USDT perpetual) / `futures` (delivery) / `all`
 
-## 典型场景
+## Typical scenarios
 
-**「BTC 永续比现货溢价多少？」**
+**"What is the premium of the BTC perpetual over spot?"**
 ```bash
-# 永续最新价
+# Perpetual latest price
 htx-cli futures-market detail-merged -p contract_code=BTC-USDT
-# 现货最新价
+# Spot latest price
 htx-cli spot-market market-detail-merged -p symbol=btcusdt
-# AI Agent 比对两者计算溢价百分比
+# AI Agent compares the two to compute the premium percentage
 ```
 
-**「ETH 永续 24h 成交额最大几个币？」**
+**"Top coins by ETH perpetual 24h turnover"**
 ```bash
 htx-cli futures-market detail-batch-merged -p business_type=swap
-# 解析 vol 字段排序
+# Parse and sort by the vol field
 ```
 
-**「BTC 永续合约 size 是多少？」**
+**"What is the contract size of the BTC perpetual?"**
 ```bash
 htx-cli futures-market contract-info -p contract_code=BTC-USDT
-# contract_size 字段：BTC-USDT = 0.001 BTC/张
+# contract_size field: BTC-USDT = 0.001 BTC per contract
 ```
 
-## 注意事项
+## Notes
 
-- 本 skill 只覆盖**通用行情**。专项数据请用独立 skill：
-  - 资金费率 → `htx/funding-rate`
-  - 持仓量 → `htx/oi-tracker`
-  - 多空比 → `htx/elite-positioning`
-  - 清算订单 → `htx/liquidation-stream`
-  - 标记价 / 基差 → `htx/mark-price`
-  - 结算 / 保险基金 → `htx/settlement`
-- 写操作（下单、改杠杆）请用 `htx/futures-trading`
-- 账户查询请用 `htx/futures-account`
+- This skill only covers **general market data**. For specialized data, use the dedicated skill:
+  - Funding rate → `htx/funding-rate`
+  - Open interest → `htx/oi-tracker`
+  - Long/short ratio → `htx/elite-positioning`
+  - Liquidation orders → `htx/liquidation-stream`
+  - Mark price / basis → `htx/mark-price`
+  - Settlement / insurance fund → `htx/settlement`
+- For write operations (order placement, leverage change), use `htx/futures-trading`
+- For account queries, use `htx/futures-account`
 
-## 安装
+## Installation
 
 ```bash
 npx -y @sheerl/htx-cli skill install futures-market
 ```
 
-## 相关文档
+## Related docs
 
-- HTX 永续合约 API: https://huobiapi.github.io/docs/usdt_swap/v1/cn/
+- HTX perpetual futures API: https://huobiapi.github.io/docs/usdt_swap/v1/cn/

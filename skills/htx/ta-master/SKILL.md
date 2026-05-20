@@ -1,30 +1,30 @@
 ---
 name: htx/ta-master
 version: 1.0.0
-description: HTX 技术分析大师 — 三支柱加权评分（价量 50% + 衍生品 30% + BTC 周期 20%）→ 0-100 综合评分 + 详细解读
+description: HTX technical analysis master — three-pillar weighted scoring (price/volume 50% + derivatives 30% + BTC cycle 20%) yielding a 0-100 composite score with detailed interpretation.
 auth: false
 risk: low
 ---
 
-# Technical Analysis Master — 技术分析大师
+# Technical Analysis Master
 
-Layer 2 编排型 skill，**无需 API Key**。综合 6 个 L1 skill 输出三支柱评分，给出 0-100 综合判断。
+Layer 2 orchestration skill, **no API key required**. Composes 6 L1 skills into a three-pillar score and provides a 0-100 composite read.
 
-> **合规声明**：评分为机械算法输出，**不构成投资建议**。市场有风险，决策由用户自行做出。
+> **Compliance disclaimer**: the score is a mechanical algorithmic output and **does not constitute investment advice**. Markets carry risk; all decisions are made by the user.
 
-## 三支柱评分体系
+## Three-pillar scoring framework
 
-| 支柱 | 权重 | 数据源 | 输出 |
+| Pillar | Weight | Data source | Output |
 |---|---|---|---|
-| 价量因子 | **50%** | `htx/technical-analysis`（51 指标 + 12 形态 + 背离） | 0-100 子分 |
-| 衍生品 | **30%** | `funding-rate` / `oi-tracker` / `liquidation-stream` / `elite-positioning` / `mark-price` | 0-100 子分 |
-| BTC 周期 | **20%** | `htx/technical-analysis cycle.py`（仅 BTC-USDT 适用） | 0-100 子分 |
+| Price/Volume | **50%** | `htx/technical-analysis` (51 indicators + 12 patterns + divergences) | 0-100 sub-score |
+| Derivatives | **30%** | `funding-rate` / `oi-tracker` / `liquidation-stream` / `elite-positioning` / `mark-price` | 0-100 sub-score |
+| BTC cycle | **20%** | `htx/technical-analysis cycle.py` (BTC-USDT only) | 0-100 sub-score |
 
-非 BTC 时自动重新分配权重为 价量 62.5% + 衍生品 37.5%。
+For non-BTC assets the weights are auto-redistributed to price/volume 62.5% + derivatives 37.5%.
 
-## 综合评分解读
+## Composite score interpretation
 
-| 综合评分 | 标签 |
+| Composite score | Label |
 |---|---|
 | ≥ 70 | **STRONG BULLISH** |
 | 55-70 | MILD BULLISH |
@@ -32,16 +32,16 @@ Layer 2 编排型 skill，**无需 API Key**。综合 6 个 L1 skill 输出三�
 | 30-45 | MILD BEARISH |
 | < 30 | **STRONG BEARISH** |
 
-## 工作流
+## Workflow
 
-### 完整版（BTC，三支柱）
+### Full version (BTC, three pillars)
 
 ```bash
-# 1. 拉日 K（周期支柱需 350+ 日 K）
+# 1. Pull daily klines (cycle pillar needs 350+ daily klines)
 htx-cli spot-market kline -p symbol=btcusdt -p period=1day -p size=400 | jq '.data' > /tmp/btc1d.json
 htx-cli spot-market kline -p symbol=btcusdt -p period=4hour -p size=300 | jq '.data' > /tmp/btc4h.json
 
-# 2. 计算价量特征 → pv.json
+# 2. Compute price/volume features → pv.json
 python -c "
 import json
 import indicators, patterns
@@ -59,29 +59,29 @@ out = {
 json.dump(out, open('/tmp/pv.json', 'w'))
 "
 
-# 3. 拉衍生品 → deriv.json
+# 3. Pull derivatives → deriv.json
 htx-cli funding-rate current -p contract_code=BTC-USDT --json > /tmp/fr.json
 htx-cli oi-tracker history -p contract_code=BTC-USDT -p period=60min -p size=24 --json > /tmp/oi.json
 htx-cli liquidation-stream recent -p contract=BTC-USDT --json > /tmp/liq.json
 htx-cli elite-positioning ratio -p contract_code=BTC-USDT --json > /tmp/elite.json
 htx-cli mark-price basis -p contract_code=BTC-USDT --json > /tmp/basis.json
-# 然后聚合成 deriv.json（参考 references/derivatives-features.md）
+# Then aggregate into deriv.json (see references/derivatives-features.md)
 
-# 4. 计算周期支柱 → cycle.json (BTC only)
+# 4. Compute cycle pillar → cycle.json (BTC only)
 python scripts/cycle.py all --kline /tmp/btc1d.json > /tmp/cycle_raw.json
-# 提取关键字段成 cycle.json: ahr999 / mayer / pi_cycle_signal / rainbow_band
+# Extract key fields into cycle.json: ahr999 / mayer / pi_cycle_signal / rainbow_band
 
-# 5. 三支柱合并评分
+# 5. Three-pillar combined score
 python scripts/scoring.py --pricevol /tmp/pv.json --derivatives /tmp/deriv.json --cycle /tmp/cycle.json
 ```
 
-### 简版（非 BTC，两支柱）
+### Simple version (non-BTC, two pillars)
 
 ```bash
 python scripts/scoring.py --pricevol pv.json --derivatives deriv.json
 ```
 
-输出示例（BTC 完整三支柱）：
+Example output (BTC full three-pillar):
 
 ```json
 {
@@ -107,89 +107,89 @@ python scripts/scoring.py --pricevol pv.json --derivatives deriv.json
 }
 ```
 
-## 评分细则
+## Scoring details
 
-详见 `scripts/scoring.py` 源码。每个支柱都列出贡献分项与说明。
+See `scripts/scoring.py` for the source. Each pillar lists its contributing items and notes.
 
-### 价量支柱评分项
+### Price/volume pillar items
 
-| 信号 | 加分 / 减分 |
+| Signal | Add / subtract |
 |---|---|
-| RSI > 70 (超买) | -10 |
-| RSI > 55 (偏多) | +5 |
-| RSI < 30 (超卖) | +10 |
-| RSI < 45 (偏空) | -5 |
+| RSI > 70 (overbought) | -10 |
+| RSI > 55 (bullish-leaning) | +5 |
+| RSI < 30 (oversold) | +10 |
+| RSI < 45 (bearish-leaning) | -5 |
 | MACD hist > 0 / < 0 | ±7 |
-| EMA fast 上 / 下 slow | ±8 |
-| ADX > 25 | 强趋势放大器（不直接打分） |
-| 看涨规则背离 (`bull_reg`) | +12 |
-| 看跌规则背离 (`bear_reg`) | -12 |
-| 看涨 / 看跌隐藏背离 | ±6 |
-| 每个看涨形态 | +4 |
-| 每个看跌形态 | -4 |
+| EMA fast above / below slow | ±8 |
+| ADX > 25 | strong-trend amplifier (no direct score) |
+| Bullish regular divergence (`bull_reg`) | +12 |
+| Bearish regular divergence (`bear_reg`) | -12 |
+| Bullish / bearish hidden divergence | ±6 |
+| Each bullish pattern | +4 |
+| Each bearish pattern | -4 |
 
-### 衍生品支柱评分项
+### Derivatives pillar items
 
-| 信号 | 加分 / 减分 |
+| Signal | Add / subtract |
 |---|---|
-| Funding > 0.05% | -12（多头过度） |
-| Funding < -0.05% | +12（空头过度） |
-| OI 24h +15% | -8（挤仓风险） |
-| OI 24h -10% | -6（资金离场） |
-| Elite L/S > 1.5 | +10（聪明钱多） |
-| Elite L/S < 0.7 | -10（聪明钱空） |
-| 1h 多头清算占比 > 80% | +8（底部信号） |
-| 1h 空头清算占比 > 80% | -8（顶部信号） |
-| Basis 偏离 ±0.5% | ±4 |
+| Funding > 0.05% | -12 (longs overheated) |
+| Funding < -0.05% | +12 (shorts overheated) |
+| OI 24h +15% | -8 (squeeze risk) |
+| OI 24h -10% | -6 (capital exiting) |
+| Elite L/S > 1.5 | +10 (smart money long) |
+| Elite L/S < 0.7 | -10 (smart money short) |
+| 1h long-liquidation share > 80% | +8 (bottom signal) |
+| 1h short-liquidation share > 80% | -8 (top signal) |
+| Basis deviation ±0.5% | ±4 |
 
-### BTC 周期支柱评分项
+### BTC cycle pillar items
 
-| 信号 | 加分 / 减分 |
+| Signal | Add / subtract |
 |---|---|
-| AHR999 < 0.45 | +20（抄底区） |
-| AHR999 > 1.6 | -20（泡沫预警） |
-| Pi Cycle TOP 触发 | -25 ⚠️ |
+| AHR999 < 0.45 | +20 (bottom-fishing zone) |
+| AHR999 > 1.6 | -20 (bubble warning) |
+| Pi Cycle TOP triggered | -25 WARNING |
 | Mayer < 1 | +8 |
 | Mayer > 2.4 | -12 |
-| Rainbow 在 Fire Sale / BUY / Accumulate | +10 |
-| Rainbow 在 FOMO / Sell / Bubble | -10 |
+| Rainbow in Fire Sale / BUY / Accumulate | +10 |
+| Rainbow in FOMO / Sell / Bubble | -10 |
 
-## 数据缺口（诚实声明）
+## Data gaps (honest disclosure)
 
-ta-master **不覆盖**以下指标（HTX 无原生 endpoint，需付费数据源）：
+ta-master **does not cover** the following indicators (HTX provides no native endpoint; paid data sources are required):
 
-| 缺口 | 来源 |
+| Gap | Source |
 |---|---|
-| MVRV / NUPL / SOPR | Glassnode（链上） |
-| Hash Ribbon / 矿工算力 | Mempool.space |
-| LTH/STH 持仓供应 | Glassnode |
-| 全账户多空比（散户口径） | HTX 仅提供精英口径 |
-| Taker 主动买卖量 | HTX 未提供 |
-| 清算热力图密度 | 我们用清算订单流本地聚合，密度比 Coinglass 低 |
+| MVRV / NUPL / SOPR | Glassnode (on-chain) |
+| Hash Ribbon / miner hashrate | Mempool.space |
+| LTH/STH supply | Glassnode |
+| All-account long/short ratio (retail breakdown) | HTX only provides the elite breakdown |
+| Taker active buy/sell volume | Not provided by HTX |
+| Liquidation heatmap density | We aggregate from the local liquidation order stream; density is lower than Coinglass |
 
-未来可选：通过 `--external-source glassnode` 等扩展集成。
+Future option: integrate via `--external-source glassnode` etc.
 
-## 依赖 skill
+## Dependent skills
 
-安装本 skill 前，确保已安装：
-- `htx/spot-market`（K线源）
-- `htx/futures-market`（K线源）
-- `htx/technical-analysis`（指标计算引擎）
+Before installing this skill, ensure the following are installed:
+- `htx/spot-market` (kline source)
+- `htx/futures-market` (kline source)
+- `htx/technical-analysis` (indicator computation engine)
 - `htx/funding-rate`
 - `htx/oi-tracker`
 - `htx/liquidation-stream`
 - `htx/elite-positioning`
 - `htx/mark-price`
 
-## 安装
+## Installation
 
 ```bash
 npx -y @sheerl/htx-cli skill install ta-master
 ```
 
-## 典型问法
+## Typical questions
 
-- "BTC 现在技术 + 衍生品 + 周期综合看怎么样？"
-- "ETH 4H 综合评分"
-- "全市场扫描，给我 ta-master 评分 > 70 的币种"
-- "BTC 现在 AHR999 + 资金费率 + RSI 三个一起判断"
+- "How does BTC look right now combining technicals + derivatives + cycle?"
+- "ETH 4H composite score"
+- "Market-wide scan, give me coins with ta-master score > 70"
+- "Judge BTC right now using AHR999 + funding rate + RSI together"

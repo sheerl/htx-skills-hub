@@ -84,8 +84,8 @@
     if (!skill) {
       wrap.innerHTML = `
         <div class="breadcrumb"><a href="index.html">← Skills</a></div>
-        <h1>未找到 Skill</h1>
-        <p>Slug "<code>${slug || ''}</code>" 不在目录里。</p>`;
+        <h1>Skill not found</h1>
+        <p>Slug "<code>${slug || ''}</code>" is not in the catalog.</p>`;
       return;
     }
 
@@ -134,12 +134,12 @@
         </div>
         <div class="d-hero-right">
           <div class="d-install">
-            <div class="d-install-label">一行命令安装</div>
+            <div class="d-install-label">One-line install</div>
             <div class="d-install-cmd">
               <code>${skill.install}</code>
-              <button class="copy-btn" data-copy="${skill.install}">复制</button>
+              <button class="copy-btn" data-copy="${skill.install}">Copy</button>
             </div>
-            <a class="d-install-link" href="${ghUrl}" target="_blank" rel="noopener">在 GitHub 查看源码 →</a>
+            <a class="d-install-link" href="${ghUrl}" target="_blank" rel="noopener">View source on GitHub →</a>
           </div>
         </div>
       </header>
@@ -154,56 +154,56 @@
 
       ${scenarios.length ? `
       <section class="d-block">
-        <h2 class="d-block-title">典型用户问法</h2>
-        <p class="d-block-sub">告诉 AI Agent 任意一句话，它会自动选择本 Skill 完成任务。</p>
+        <h2 class="d-block-title">Typical User Queries</h2>
+        <p class="d-block-sub">Say any of these to your AI Agent and it will automatically pick this Skill to handle the task.</p>
         <div class="d-bubbles">${scenarioBubbles}</div>
       </section>` : ''}
 
       <section class="d-block">
-        <h2 class="d-block-title">三步上手</h2>
+        <h2 class="d-block-title">Three Steps to Get Started</h2>
         <div class="d-steps">
           <div class="d-step">
             <div class="d-step-num">1</div>
             <div class="d-step-body">
-              <div class="d-step-title">安装 Skill</div>
-              <div class="d-step-desc">在 AI Agent 终端运行安装命令，约 5 秒完成。</div>
+              <div class="d-step-title">Install the Skill</div>
+              <div class="d-step-desc">Run the install command in your AI Agent terminal — done in about 5 seconds.</div>
             </div>
           </div>
           <div class="d-step">
             <div class="d-step-num">2</div>
             <div class="d-step-body">
-              <div class="d-step-title">自然语言提问</div>
-              <div class="d-step-desc">用人话告诉 AI Agent 你想要什么，无需记任何命令。</div>
+              <div class="d-step-title">Ask in Natural Language</div>
+              <div class="d-step-desc">Just tell your AI Agent what you want in plain English — no commands to memorize.</div>
             </div>
           </div>
           <div class="d-step">
             <div class="d-step-num">3</div>
             <div class="d-step-body">
-              <div class="d-step-title">AI 自动执行</div>
-              <div class="d-step-desc">AI 调用本 Skill 拉取 HTX 实时数据，给出结构化结果。</div>
+              <div class="d-step-title">AI Executes Automatically</div>
+              <div class="d-step-desc">The AI calls this Skill to pull live HTX data and returns structured results.</div>
             </div>
           </div>
         </div>
       </section>
 
       <section class="d-block">
-        <h2 class="d-block-title">标签</h2>
+        <h2 class="d-block-title">Tags</h2>
         <div class="tag-cloud">${tags}</div>
       </section>
 
       <section class="d-block">
-        <h2 class="d-block-title">相关 Skill</h2>
+        <h2 class="d-block-title">Related Skills</h2>
         <div class="related-grid">${relatedHtml}</div>
       </section>
 
       <section class="d-block">
-        <h2 class="d-block-title">完整文档</h2>
+        <h2 class="d-block-title">Full Documentation</h2>
         <div class="d-cta">
-          <p class="d-block-sub">SKILL.md / README / references 全部在 GitHub。</p>
+          <p class="d-block-sub">SKILL.md / README / references — all on GitHub.</p>
           <div class="d-cta-row">
-            <a class="btn btn-primary" href="${ghUrl}" target="_blank" rel="noopener">在 GitHub 查看源码</a>
+            <a class="btn btn-primary" href="${ghUrl}" target="_blank" rel="noopener">View on GitHub</a>
             <a class="btn btn-secondary" href="${ghUrl}/SKILL.md" target="_blank" rel="noopener">README</a>
-            <a class="btn btn-secondary" href="https://www.npmjs.com/package/@sheerl/htx-cli" target="_blank" rel="noopener">NPM 包</a>
+            <a class="btn btn-secondary" href="https://www.npmjs.com/package/@sheerl/htx-cli" target="_blank" rel="noopener">NPM Package</a>
           </div>
         </div>
       </section>
@@ -214,7 +214,7 @@
         e.preventDefault();
         navigator.clipboard.writeText(b.dataset.copy);
         const orig = b.textContent;
-        b.textContent = '已复制 ✓';
+        b.textContent = 'Copied ✓';
         setTimeout(() => (b.textContent = orig), 1400);
       });
     });
@@ -227,31 +227,31 @@
 
   function getSkillStats(skill) {
     const tags = skill.tags || [];
-    const isTrading = tags.includes('下单') || tags.includes('合约下单') || tags.includes('高风险');
+    const isTrading = tags.includes('Order Placement') || tags.includes('Futures Orders') || tags.includes('High Risk');
     const isAccount = skill.auth && !isTrading;
     const isAnalyst = skill.category === 'analyst';
 
     const stats = [
       {
         icon: skill.auth ? '🔐' : '🌐',
-        label: '权限',
-        value: skill.auth ? '需 API Key' : '无需鉴权',
+        label: 'Permissions',
+        value: skill.auth ? 'API Key Required' : 'No Auth Required',
       },
       {
         icon: '💻',
-        label: '运行环境',
-        value: '本地 / 数据不外发',
+        label: 'Runtime',
+        value: 'Local / Data Stays On-Device',
       },
     ];
 
     if (isTrading) {
-      stats.push({ icon: '🔒', label: '下单操作', value: '强制人工确认' });
+      stats.push({ icon: '🔒', label: 'Order Actions', value: 'Manual Confirmation Enforced' });
     } else if (isAccount) {
-      stats.push({ icon: '🛡️', label: '资金划转', value: '强制人工确认' });
+      stats.push({ icon: '🛡️', label: 'Fund Transfers', value: 'Manual Confirmation Enforced' });
     } else if (isAnalyst) {
-      stats.push({ icon: '🧮', label: '计算方式', value: '本地开源可审计' });
+      stats.push({ icon: '🧮', label: 'Compute', value: 'Local, Open-Source, Auditable' });
     } else {
-      stats.push({ icon: '⚡', label: '数据时效', value: '实时 REST 拉取' });
+      stats.push({ icon: '⚡', label: 'Freshness', value: 'Real-Time REST Pulls' });
     }
 
     return stats;

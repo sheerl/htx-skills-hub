@@ -1,22 +1,22 @@
-# 板块 / 主题分类参考
+# Sector / Theme Classification Reference
 
-`htx/market-overview` skill 在做板块轮动分析时使用本文件。每个板块列出代表性币种符号。
+The `htx/market-overview` skill uses this file for sector rotation analysis. Each sector lists representative coin symbols.
 
-> 仅作为分类参考。币种可同时属于多个板块；新币种需手动追加。
+> Reference only. Coins may belong to multiple sectors; new coins must be added manually.
 
-## Layer 1 公链
+## Layer 1 Public Chains
 
 `btcusdt` `ethusdt` `solusdt` `bnbusdt` `avaxusdt` `adausdt` `dotusdt` `nearusdt` `aptusdt` `suiusdt` `tonusdt` `tronusdt` `xrpusdt` `atomusdt` `algousdt`
 
-## Layer 2 / 扩容
+## Layer 2 / Scaling
 
 `arbusdt` `opusdt` `maticusdt` `imxusdt` `mantausdt` `metisusdt` `strkusdt` `bloodusdt`
 
-## DeFi (老牌)
+## DeFi (Established)
 
 `uniusdt` `aaveusdt` `crvusdt` `compusdt` `mkrusdt` `snxusdt` `1inchusdt` `sushiusdt` `bllusdt`
 
-## DeFi (新)
+## DeFi (New)
 
 `pendleusdt` `gmxusdt` `dydxusdt` `jtousdt` `jupusdt` `eigenusdt` `etheusdt`
 
@@ -24,7 +24,7 @@
 
 `ondousdt` `mklusdt` `pendle usdt` `crvusdt`
 
-## AI / 算力
+## AI / Compute
 
 `fetusdt` `agixusdt` `oceanusdt` `wldusdt` `taousdt` `renderusdt` `iousdt` `aktusdt` `nosusdt`
 
@@ -32,7 +32,7 @@
 
 `dogeusdt` `shibusdt` `pepeusdt` `wifusdt` `bonkusdt` `flokiusdt` `popcatusdt` `mewusdt` `notusdt` `mogusdt` `brettusdt`
 
-## GameFi / 元宇宙
+## GameFi / Metaverse
 
 `axsusdt` `sandusdt` `manausdt` `apeusdt` `gmtusdt` `iloveusdt` `pixelusdt` `galaxyusdt` `enjusdt`
 
@@ -56,13 +56,13 @@
 
 `cyberusdt` `frienusdt` `arkmusdt`
 
-## 其他主题（持续追加）
+## Other Themes (continuously added)
 
-- **Bitcoin 生态**：`ordibtcusdt` `satsusdt` `runeusdt`
-- **Cosmos 生态**：`atomusdt` `osmusdt` `injusdt` `tiausdt` `dymusdt`
-- **Solana 生态**：`jupusdt` `wifusdt` `jtousdt` `bonkusdt` `pythusdt` `wenusdt`
-- **TON 生态**：`tonusdt` `notusdt` `dogsusdt` `hmstrusdt`
+- **Bitcoin ecosystem**: `ordibtcusdt` `satsusdt` `runeusdt`
+- **Cosmos ecosystem**: `atomusdt` `osmusdt` `injusdt` `tiausdt` `dymusdt`
+- **Solana ecosystem**: `jupusdt` `wifusdt` `jtousdt` `bonkusdt` `pythusdt` `wenusdt`
+- **TON ecosystem**: `tonusdt` `notusdt` `dogsusdt` `hmstrusdt`
 
-## 维护
+## Maintenance
 
-定期（每月）扫描全市场 `tickers`，发现 24h volume 排名前 50 的币种是否已纳入板块映射；若新币种未归类，添加到合适分类。
+Periodically (monthly) scan the full market via `tickers` to check whether the top 50 coins by 24h volume have been mapped to a sector; if a new coin is unclassified, add it to the appropriate category.

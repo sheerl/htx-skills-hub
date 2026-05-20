@@ -1,49 +1,49 @@
 ---
 name: htx/spot-account
 version: 2.0.0
-description: HTX 现货账户 — 余额 / 持仓 / 资产估值 / 现货 ↔ 合约划转
+description: HTX spot account — balance / holdings / asset valuation / spot ↔ futures transfers.
 auth: true
 risk: medium
 ---
 
-# Spot Account — 现货账户
+# Spot Account
 
-查询现货账户与子账户余额、估值、流水，以及账户间资金划转。
+Query spot account and sub-account balance, valuation, transaction history, and inter-account transfers.
 
-> **鉴权**：所有 endpoint 需要 API Key（read 权限即可，划转需 trade 权限）
-> **风险**：read 类无副作用；transfer 类必须二次确认
+> **Authentication**: all endpoints require an API key (read permission is enough; transfers need trade permission)
+> **Risk**: read endpoints have no side effects; transfer endpoints require manual confirmation
 
-## 何时使用
+## When to use
 
-- 查询账户列表 / 单账户余额 / 全资产估值
-- 现货账户内不同币种间查询
-- 现货 ↔ USDT-M / COIN-M 永续合约的资金划转
-- 子账户余额查询、子账户间划转
+- Query account list / single-account balance / total asset valuation
+- Look up balances across different currencies inside the spot account
+- Transfer funds between spot and USDT-M / COIN-M perpetual futures
+- Query sub-account balance, transfer between sub-accounts
 
-## 快速开始
+## Quick start
 
 ```bash
-# 列出所有账户
+# List all accounts
 htx-cli spot account list
 
-# 查询某账户余额（需先获取 account-id）
+# Query a specific account balance (account-id required)
 htx-cli spot account balance <account-id>
 
-# 全资产 USD 估值
+# Total asset USD valuation
 htx-cli spot account valuation
 ```
 
-## Endpoint 目录（10 个）
+## Endpoint catalog (10)
 
-### 账户查询 — read (5)
+### Account query — read (5)
 
-| # | Method | Endpoint | CLI | 描述 |
-|---|--------|----------|-----|------|
-| 1 | GET | `/v1/account/accounts` | `htx-cli spot account list` | 列出所有账户（spot / margin / otc / point） |
-| 2 | GET | `/v1/account/accounts/{id}/balance` | `htx-cli spot account balance <id>` | 单账户币种余额 |
-| 3 | GET | `/v2/account/asset-valuation` | `htx-cli spot account valuation` | 全资产折算（USD / BTC） |
-| 4 | GET | `/v1/account/history` | `htx-cli spot account history` | 账户流水（最近 7 天） |
-| 5 | GET | `/v1/query/deposit-withdraw` | `htx-cli spot account deposit-withdraw` | 充提币记录 |
+| # | Method | Endpoint | CLI | Description |
+|---|--------|----------|-----|-------------|
+| 1 | GET | `/v1/account/accounts` | `htx-cli spot account list` | List all accounts (spot / margin / otc / point) |
+| 2 | GET | `/v1/account/accounts/{id}/balance` | `htx-cli spot account balance <id>` | Per-currency balance of a single account |
+| 3 | GET | `/v2/account/asset-valuation` | `htx-cli spot account valuation` | Total asset valuation (USD / BTC) |
+| 4 | GET | `/v1/account/history` | `htx-cli spot account history` | Account history (last 7 days) |
+| 5 | GET | `/v1/query/deposit-withdraw` | `htx-cli spot account deposit-withdraw` | Deposit/withdraw records |
 
 ### 资金划转 — write (5)
 
@@ -91,7 +91,7 @@ Before calling any transfer endpoint, **display to the user** source, destinatio
 - Wrong-direction transfers can cause margin shortfall or forced liquidation.
 - API Key never leaves your machine.
 
-## 安装
+## Installation
 
 ```bash
 npx -y @sheerl/htx-cli skill install spot-account

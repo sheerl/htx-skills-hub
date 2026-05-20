@@ -1,109 +1,109 @@
 ---
 name: htx/technical-analysis
 version: 3.0.0
-description: HTX 技术指标分析引擎 — 51 指标 + 12 K线形态 + 5 BTC 周期指标 + 自动背离检测，全部本地 Python 计算
+description: HTX technical indicator analysis engine — 51 indicators + 12 candlestick patterns + 5 BTC cycle indicators + automatic divergence detection, all computed locally in Python.
 auth: false
 risk: low
 ---
 
-# Technical Analysis — 技术指标分析引擎 v3
+# Technical Analysis — Indicator Engine v3
 
-本地计算引擎，**无需 API Key**。从 HTX K线 endpoint 拉数据，本地用 numpy/pandas 算指标 / 形态 / 周期。
+Local computation engine, **no API key required**. Pulls data from HTX kline endpoints and computes indicators / patterns / cycles locally with numpy/pandas.
 
-> **合规声明**：本 skill 提供原始指标数值，不嵌入任何策略推荐或交易建议。所有判断由用户结合自身风险承受能力做出。
+> **Compliance disclaimer**: this skill provides raw indicator values and does not embed any strategy recommendations or trading advice. All decisions are made by the user based on their own risk tolerance.
 
-## 能力总览
+## Capability overview
 
-| 类别 | 数量 | 文件 |
+| Category | Count | File |
 |---|---|---|
-| 移动均线 | 8 (ma, ema, wma, dema, tema, hma, kama, zlema) | `scripts/indicators.py` |
-| 趋势 | 8 (macd, adx, aroon, cci, supertrend, sar, dpo, envelope) | 同上 |
-| 动量 | 10 (rsi, stoch-rsi, stoch, kdj, roc, mom, ppo, trix, wr, uo) | 同上 |
-| 波动率 | 8 (bb, bbwidth, bbpct, atr, keltner, donchian, hv, stddev) | 同上 |
-| 成交量 | 6 (obv, vwap, mvwap, cmf, mfi, ad) | 同上 |
-| 统计 | 5 (lr, slope, angle, variance, sigma) | 同上 |
-| 其他 | 5 (fisher, tr, tp, mp, cho) + divergence | 同上 |
-| **K线形态** | 12 (doji / engulfing / harami / 3-soldiers / 3-crows ...) | `scripts/patterns.py` |
-| **BTC 周期** | 5 (ahr999 / ahr999x / rainbow / pi-cycle / mayer) | `scripts/cycle.py` |
-| **指标合计** | **51 指标 + 12 形态 + 5 周期 = 68** | |
+| Moving averages | 8 (ma, ema, wma, dema, tema, hma, kama, zlema) | `scripts/indicators.py` |
+| Trend | 8 (macd, adx, aroon, cci, supertrend, sar, dpo, envelope) | same |
+| Momentum | 10 (rsi, stoch-rsi, stoch, kdj, roc, mom, ppo, trix, wr, uo) | same |
+| Volatility | 8 (bb, bbwidth, bbpct, atr, keltner, donchian, hv, stddev) | same |
+| Volume | 6 (obv, vwap, mvwap, cmf, mfi, ad) | same |
+| Statistics | 5 (lr, slope, angle, variance, sigma) | same |
+| Other | 5 (fisher, tr, tp, mp, cho) + divergence | same |
+| **Candlestick patterns** | 12 (doji / engulfing / harami / 3-soldiers / 3-crows ...) | `scripts/patterns.py` |
+| **BTC cycle** | 5 (ahr999 / ahr999x / rainbow / pi-cycle / mayer) | `scripts/cycle.py` |
+| **Indicator total** | **51 indicators + 12 patterns + 5 cycles = 68** | |
 
-## 快速上手
+## Quick start
 
-### 拉 K线 + 算指标
+### Pull klines + compute indicators
 
 ```bash
-# 1. 拉 BTC/USDT 4小时 K线
+# 1. Pull BTC/USDT 4-hour klines
 htx-cli spot-market kline -p symbol=btcusdt -p period=4hour -p size=300 \
   | jq '.data' > /tmp/btc4h.json
 
-# 2. 算 RSI
+# 2. Compute RSI
 python scripts/indicators.py rsi --kline /tmp/btc4h.json --params 14
 # → {"rsi": 62.4, "ts": 1779000000000}
 
-# 3. 算 MACD（默认 12,26,9）
+# 3. Compute MACD (default 12,26,9)
 python scripts/indicators.py macd --kline /tmp/btc4h.json
 # → {"dif": 320.1, "dea": 245.3, "macd": 149.6, "ts": ...}
 
-# 4. 扫描所有 K线形态
+# 4. Scan all candlestick patterns
 python scripts/patterns.py scan --kline /tmp/btc4h.json
 # → {"patterns": ["doji", "bull-engulf"], "ts": ...}
 
-# 5. BTC 周期一键全测
+# 5. BTC cycle one-shot full run
 python scripts/cycle.py all --kline /tmp/btc1d.json
 ```
 
-### 列出所有指标
+### List all indicators
 
 ```bash
 python scripts/indicators.py list
 # → ["ma", "ema", "rsi", "macd", "supertrend", ...]
 ```
 
-## 命令参考
+## Command reference
 
-详见 `references/`：
-- `references/indicators.md` — 51 个技术指标的参数 / 返回字段 / 公式说明
-- `references/patterns.md` — 12 个 K线形态的判定规则与典型场景
-- `references/cycle.md` — BTC 5 个周期指标的公式与解读区间
-- `references/divergence.md` — 自动背离检测的算法 + 使用建议
+See `references/`:
+- `references/indicators.md` — parameters / return fields / formulas for the 51 technical indicators
+- `references/patterns.md` — judgment rules and typical scenarios for the 12 candlestick patterns
+- `references/cycle.md` — formulas and interpretation ranges for the 5 BTC cycle indicators
+- `references/divergence.md` — automatic divergence detection algorithm and usage notes
 
-## 自动背离检测
+## Automatic divergence detection
 
 ```bash
 python scripts/indicators.py divergence --kline /tmp/btc4h.json --params 14
 # → {"divergence": "bull_reg", ...}
 ```
 
-返回值：
-- `bull_reg` — 价格创新低，指标未创新低（**底部反转信号**）
-- `bear_reg` — 价格创新高，指标未创新高（**顶部反转信号**）
-- `bull_hid` — 价格更高低点，指标更低低点（**回调延续多头**）
-- `bear_hid` — 价格更低高点，指标更高高点（**反弹延续空头**）
+Return values:
+- `bull_reg` — price makes a new low, indicator does not (**bottom reversal signal**)
+- `bear_reg` — price makes a new high, indicator does not (**top reversal signal**)
+- `bull_hid` — price makes a higher low, indicator a lower low (**pullback within uptrend**)
+- `bear_hid` — price makes a lower high, indicator a higher high (**bounce within downtrend**)
 
-## BTC 周期指标（仅 BTC-USDT 适用）
+## BTC cycle indicators (BTC-USDT only)
 
-5 个指标全部基于价格 + 时间公式，无需链上数据：
+All 5 indicators are based on price + time formulas; no on-chain data required:
 
-| 指标 | 用途 | 解读 |
+| Indicator | Use | Interpretation |
 |---|---|---|
-| `ahr999` | 定投择时 | <0.45 抄底 / 0.45-1.2 定投 / >1.2 顶部预警 |
-| `ahr999x` | 纯周期信号 | 与 fitted curve 比值 |
-| `rainbow` | 9 段彩虹估值带 | "Fire Sale" → "Maximum Bubble" |
-| `pi-cycle` | 周期顶预警 | 111d MA 上穿 350d MA × 2 = 历史顶 |
-| `mayer` | 长期估值 | <1 低估 / >2.4 历史泡沫 |
+| `ahr999` | DCA timing | <0.45 bottom-fish / 0.45-1.2 DCA / >1.2 top warning |
+| `ahr999x` | Pure cycle signal | Ratio vs fitted curve |
+| `rainbow` | 9-band rainbow valuation | "Fire Sale" → "Maximum Bubble" |
+| `pi-cycle` | Cycle-top warning | 111d MA crosses above 350d MA × 2 = historical top |
+| `mayer` | Long-term valuation | <1 undervalued / >2.4 historical bubble |
 
-## 数据需求
+## Data requirements
 
-| 指标类型 | 最少 K线数 |
+| Indicator type | Min klines |
 |---|---|
-| 短周期指标（RSI 14, MACD 26, ATR 14） | 50 根 |
-| 长周期指标（MA200, KAMA） | 200+ 根 |
-| BTC 周期（Pi Cycle 350d, Mayer 200d） | 350+ 根日 K |
-| 背离检测 | 50+ 根 |
+| Short-period (RSI 14, MACD 26, ATR 14) | 50 bars |
+| Long-period (MA200, KAMA) | 200+ bars |
+| BTC cycle (Pi Cycle 350d, Mayer 200d) | 350+ daily klines |
+| Divergence detection | 50+ bars |
 
-## 典型场景
+## Typical scenarios
 
-**「BTC 4H 技术面怎么看」**
+**"How does BTC 4H look technically?"**
 ```bash
 htx-cli spot-market kline -p symbol=btcusdt -p period=4hour -p size=200 | jq '.data' > btc.json
 python scripts/indicators.py rsi --kline btc.json
@@ -111,27 +111,27 @@ python scripts/indicators.py macd --kline btc.json
 python scripts/indicators.py supertrend --kline btc.json
 python scripts/patterns.py scan --kline btc.json
 python scripts/indicators.py divergence --kline btc.json
-# AI 综合所有输出做判断
+# AI synthesizes all outputs to make a judgment
 ```
 
-**「ETH 是否超买」**
+**"Is ETH overbought?"**
 ```bash
 python scripts/indicators.py rsi --kline eth4h.json
-# rsi > 70 即超买
+# rsi > 70 means overbought
 ```
 
-**「BTC 现在长期估值水平」**
+**"BTC long-term valuation right now"**
 ```bash
 htx-cli spot-market kline -p symbol=btcusdt -p period=1day -p size=400 | jq '.data' > btc1d.json
 python scripts/cycle.py all --kline btc1d.json
 ```
 
-## 与其他 skill 的关系
+## Relationship with other skills
 
-- **数据来源**：依赖 `htx/spot-market` 或 `htx/futures-market` 提供 K线
-- **上层编排**：被 `htx/ta-master` 调用，作为「价量因子」支柱
+- **Data source**: depends on `htx/spot-market` or `htx/futures-market` for klines
+- **Upper-layer orchestration**: invoked by `htx/ta-master` as the "price/volume" pillar
 
-## 安装
+## Installation
 
 ```bash
 npx -y @sheerl/htx-cli skill install technical-analysis

@@ -1,10 +1,10 @@
-# BTC 周期指标参考
+# BTC Cycle Indicator Reference
 
-5 个指标全部基于 BTC 历史价格 + 时间公式（创世日期 2009-01-03），无需链上数据。**仅适用于 BTC-USDT**。
+All 5 indicators are based purely on BTC historical price + time formulas (genesis date 2009-01-03), with no on-chain data required. **Applicable to BTC-USDT only**.
 
 ```bash
 python scripts/cycle.py <name> --kline btc1d.json
-python scripts/cycle.py all --kline btc1d.json   # 一键全测
+python scripts/cycle.py all --kline btc1d.json   # run all at once
 ```
 
 ## AHR999
@@ -14,31 +14,31 @@ AHR999 = (price / MA200) × (price / fitted_price)
 fitted_price = 10 ^ (5.84 × log10(days_since_genesis) - 17.01)
 ```
 
-| 区间 | 含义 |
+| Range | Meaning |
 |---|---|
-| < 0.45 | **抄底区**（accumulate） |
-| 0.45 - 1.2 | 定投区（DCA） |
-| > 1.2 | 顶部预警 / bubble |
+| < 0.45 | **Bottom-fishing zone** (accumulate) |
+| 0.45 - 1.2 | DCA zone |
+| > 1.2 | Top warning / bubble |
 
 ## AHR999X
 
-仅取 cycle 因子：`price / fitted_price`，去掉 MA200 比值，更纯粹反映周期位置。
+Uses only the cycle factor: `price / fitted_price`, dropping the MA200 ratio for a purer reflection of cycle position.
 
 ## BTC Rainbow Chart
 
-9 段对数估值带：
+9 logarithmic valuation bands:
 
-| 颜色 | 名称 | 含义 |
+| Color | Name | Meaning |
 |---|---|---|
-| 蓝 | Fire Sale | 极端低估，4 年一遇 |
-| 浅蓝 | BUY! | 低估买入 |
-| 绿 | Accumulate | 累积区 |
-| 浅绿 | Still Cheap | 仍偏便宜 |
-| 黄 | HODL! | 公允价 |
-| 橙 | Hot | 偏热 |
-| 红橙 | FOMO Intensifies | FOMO 升温 |
-| 红 | Sell. Seriously. | 严肃考虑减仓 |
-| 紫 | Maximum Bubble | 极端泡沫 |
+| Blue | Fire Sale | Extreme undervaluation, once every 4 years |
+| Light Blue | BUY! | Undervalued — buy |
+| Green | Accumulate | Accumulation zone |
+| Light Green | Still Cheap | Still on the cheap side |
+| Yellow | HODL! | Fair value |
+| Orange | Hot | Running hot |
+| Red-orange | FOMO Intensifies | FOMO heating up |
+| Red | Sell. Seriously. | Seriously consider trimming |
+| Purple | Maximum Bubble | Extreme bubble |
 
 ## Pi Cycle Top
 
@@ -46,7 +46,7 @@ fitted_price = 10 ^ (5.84 × log10(days_since_genesis) - 17.01)
 Signal: 111-day MA crosses ABOVE 350-day MA × 2
 ```
 
-历史上 BTC 三次顶（2013 / 2017 / 2021）都在此信号触发后 3 天内见顶。极其罕见，一旦触发为强烈减仓信号。
+Historically all three BTC tops (2013 / 2017 / 2021) were reached within 3 days of this signal triggering. Extremely rare; once triggered it is a strong signal to reduce exposure.
 
 ## Mayer Multiple
 
@@ -54,17 +54,17 @@ Signal: 111-day MA crosses ABOVE 350-day MA × 2
 Mayer = price / 200d_MA
 ```
 
-| 区间 | 含义 |
+| Range | Meaning |
 |---|---|
-| < 1.0 | 低估 |
-| 1.0 - 1.5 | 公允 |
-| 1.5 - 2.0 | 偏高 |
-| 2.0 - 2.4 | 过热 |
-| > 2.4 | 历史泡沫区 |
+| < 1.0 | Undervalued |
+| 1.0 - 1.5 | Fair value |
+| 1.5 - 2.0 | Elevated |
+| 2.0 - 2.4 | Overheated |
+| > 2.4 | Historical bubble zone |
 
-## 数据要求
+## Data Requirements
 
-- AHR999 / AHR999X / Mayer：≥ 200 根日 K
-- Pi Cycle：≥ 350 根日 K
-- Rainbow：任意根
-- 创世前价格不存在，HTX K线 2017+ 完整。再早期价格可补 CoinMarketCap CSV
+- AHR999 / AHR999X / Mayer: >= 200 daily candles
+- Pi Cycle: >= 350 daily candles
+- Rainbow: any number
+- Pre-genesis prices do not exist; HTX klines are complete from 2017 onward. Earlier prices can be supplemented with a CoinMarketCap CSV

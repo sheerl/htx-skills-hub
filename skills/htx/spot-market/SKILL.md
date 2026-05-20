@@ -1,96 +1,96 @@
 ---
 name: htx/spot-market
 version: 2.0.0
-description: HTX 现货行情查询 — Ticker / K线 / 盘口 / 最新成交 / 币种与交易对元数据
+description: HTX spot market data — ticker / klines / order book / latest trades / currency and symbol metadata.
 auth: false
 risk: low
 ---
 
-# Spot Market — 现货行情
+# Spot Market
 
-读取 HTX 现货公开行情数据。**无需 API Key**，所有 endpoint 均为公开接口。
+Read public spot market data from HTX. **No API key required**; all endpoints are public.
 
-## 何时使用
+## When to use
 
-- 查询单个交易对实时价格、24h 涨跌幅、成交量
-- 拉取 K线（minute / hour / day / week / month 周期）
-- 查看盘口深度（买卖五/十/二十档）
-- 全市场扫描（所有交易对 ticker 快照）
-- 解析币种 / 交易对元数据（精度、最小下单量）
+- Query a single symbol's real-time price, 24h change, volume
+- Pull klines (minute / hour / day / week / month periods)
+- View order book depth (bid/ask 5/10/20 levels)
+- Market-wide scan (snapshot of all symbol tickers)
+- Look up currency / symbol metadata (precision, minimum order size)
 
-## 快速开始
+## Quick start
 
 ```bash
-# 查询 BTC/USDT 最新行情
+# Query BTC/USDT latest market data
 htx-cli spot-market market-detail-merged -p symbol=btcusdt
 
-# 拉取 ETH/USDT 4 小时 K线，最近 100 根
+# Pull last 100 ETH/USDT 4h klines
 htx-cli spot-market kline -p symbol=ethusdt -p period=4hour -p size=100
 
-# 查询全市场 ticker
+# Query market-wide tickers
 htx-cli spot-market tickers
 ```
 
-## 可用命令（13 个 endpoint）
+## Available commands (13 endpoints)
 
-### 行情类
+### Market data
 
-| 命令 | HTX endpoint | 描述 |
-|------|--------------|------|
-| `market-detail-merged` | `GET /market/detail/merged` | 单个交易对实时摘要（最新价 + 24h 统计） |
-| `market-detail` | `GET /market/detail` | 单个交易对 24h 统计明细 |
-| `tickers` | `GET /market/tickers` | 全市场所有交易对 ticker 快照 |
-| `kline` | `GET /market/history/kline` | 历史 K线（period: 1min / 5min / 15min / 30min / 60min / 4hour / 1day / 1week / 1mon） |
-| `depth` | `GET /market/depth` | 盘口深度（type: step0 / step1 / step2 / step3 / step4 / step5） |
-| `trade` | `GET /market/trade` | 最新一笔成交 |
-| `history-trade` | `GET /market/history/trade` | 历史成交（最多 2000 条） |
+| Command | HTX endpoint | Description |
+|---------|--------------|-------------|
+| `market-detail-merged` | `GET /market/detail/merged` | Single-symbol real-time summary (latest price + 24h stats) |
+| `market-detail` | `GET /market/detail` | Single-symbol 24h stats detail |
+| `tickers` | `GET /market/tickers` | Market-wide ticker snapshot for all symbols |
+| `kline` | `GET /market/history/kline` | Historical klines (period: 1min / 5min / 15min / 30min / 60min / 4hour / 1day / 1week / 1mon) |
+| `depth` | `GET /market/depth` | Order book depth (type: step0 / step1 / step2 / step3 / step4 / step5) |
+| `trade` | `GET /market/trade` | Latest single trade |
+| `history-trade` | `GET /market/history/trade` | Historical trades (max 2000) |
 
-### 元数据类
+### Metadata
 
-| 命令 | HTX endpoint | 描述 |
-|------|--------------|------|
-| `symbols` | `GET /v1/common/symbols` | 所有可交易币对列表（精度、最小下单量、状态） |
-| `currencys` | `GET /v1/common/currencys` | 所有币种列表 |
-| `currencies-v2` | `GET /v2/reference/currencies` | 币种详细信息（含充提币状态） |
-| `market-status` | `GET /v2/market-status` | 市场状态（normal / halted / cancel-only） |
-| `timestamp` | `GET /v1/common/timestamp` | 服务器时间戳 |
-| `chains` | `GET /v1/settings/common/chains` | 链信息 |
+| Command | HTX endpoint | Description |
+|---------|--------------|-------------|
+| `symbols` | `GET /v1/common/symbols` | List of all tradable symbols (precision, min order size, status) |
+| `currencys` | `GET /v1/common/currencys` | List of all currencies |
+| `currencies-v2` | `GET /v2/reference/currencies` | Currency detail (with deposit/withdraw status) |
+| `market-status` | `GET /v2/market-status` | Market status (normal / halted / cancel-only) |
+| `timestamp` | `GET /v1/common/timestamp` | Server timestamp |
+| `chains` | `GET /v1/settings/common/chains` | Chain info |
 
-## 参数说明
+## Parameter reference
 
-- `symbol` — 交易对小写无分隔符，如 `btcusdt` / `ethusdt` / `solusdt`
-- `period` — K线周期：`1min` `5min` `15min` `30min` `60min` `4hour` `1day` `1week` `1mon`
-- `size` — 返回条数，1-2000
-- `type` — depth 聚合精度：`step0`（无聚合）到 `step5`（最粗）
-- `depth` — 档位数：5 / 10 / 20
+- `symbol` — symbol in lowercase without separators, e.g. `btcusdt` / `ethusdt` / `solusdt`
+- `period` — kline period: `1min` `5min` `15min` `30min` `60min` `4hour` `1day` `1week` `1mon`
+- `size` — number of records, 1-2000
+- `type` — depth aggregation precision: `step0` (no aggregation) to `step5` (coarsest)
+- `depth` — number of levels: 5 / 10 / 20
 
-## 典型场景
+## Typical scenarios
 
-**「BTC 现在多少钱？」**
+**"How much is BTC right now?"**
 ```bash
 htx-cli spot-market market-detail-merged -p symbol=btcusdt
-# → close 字段为最新价
+# → close field is the latest price
 ```
 
-**「ETH 4h K线趋势」**
+**"ETH 4h kline trend"**
 ```bash
 htx-cli spot-market kline -p symbol=ethusdt -p period=4hour -p size=200
 ```
 
-**「24h 涨幅最大的 10 个币」**
+**"Top 10 24h gainers"**
 ```bash
 htx-cli spot-market tickers
-# 由 AI Agent 解析 data 数组，按 (close-open)/open 排序取前 10
+# AI Agent parses the data array, sorts by (close-open)/open and takes the top 10
 ```
 
-**「SOL 盘口深度」**
+**"SOL order book depth"**
 ```bash
 htx-cli spot-market depth -p symbol=solusdt -p type=step0 -p depth=20
 ```
 
-## 输出 schema 摘录
+## Output schema excerpt
 
-`market-detail-merged` 返回：
+`market-detail-merged` returns:
 ```json
 {
   "ch": "market.btcusdt.detail.merged",
@@ -110,19 +110,19 @@ htx-cli spot-market depth -p symbol=solusdt -p type=step0 -p depth=20
 }
 ```
 
-## 注意事项
+## Notes
 
-- 公开接口频控：单 IP 每秒约 100 次，建议聚合查询使用 `tickers` 一次性获取
-- 币本位永续 / 交割合约行情请用 `htx/futures-market`
-- 资金费率、持仓量、清算等专项数据见独立 skill（`htx/funding-rate` / `htx/oi-tracker` / `htx/liquidation-stream`）
+- Public endpoint rate limit: roughly 100/s per IP; use `tickers` for one-shot aggregate queries
+- For COIN-M perpetual / delivery futures market data, use `htx/futures-market`
+- For specialized data such as funding rate, open interest, liquidations, see the dedicated skill (`htx/funding-rate` / `htx/oi-tracker` / `htx/liquidation-stream`)
 
-## 安装
+## Installation
 
 ```bash
 npx -y @sheerl/htx-cli skill install spot-market
 ```
 
-## 相关文档
+## Related docs
 
-- HTX 官方 API: https://huobiapi.github.io/docs/spot/v1/cn/
-- 完整 README: ./README.md
+- HTX official API: https://huobiapi.github.io/docs/spot/v1/cn/
+- Full README: ./README.md
